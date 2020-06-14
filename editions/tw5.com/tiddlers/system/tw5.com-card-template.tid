@@ -10,8 +10,10 @@ type: text/vnd.tiddlywiki
     <div class="tc-card-title"><$transclude field="caption"><$view field="title"/></$transclude></div>
     <p><$view field="description"/></p>
  </$link>
-<div class="tc-card-author">
-    <$list filter="[is[current]has[community-author]]">by <$link to={{!!url}}>{{!!community-author}}</$link></$list></div>
+    <div class="tc-card-author">
+        <$list filter="[is[current]has[community-author]has[url]]">by <$link to={{!!url}}>{{!!community-author}}</$link></$list>
+        <$list filter="[is[current]has[community-author]!has[url]]">by {{!!community-author}}</$list>
+    </div>
 </div>
 \end
 
