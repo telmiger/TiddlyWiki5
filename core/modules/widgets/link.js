@@ -13,7 +13,6 @@ Link widget
 "use strict";
 
 var Widget = require("$:/core/modules/widgets/widget.js").widget;
-var MISSING_LINK_CONFIG_TITLE = "$:/config/MissingLinks";
 
 var LinkWidget = function(parseTreeNode,options) {
 	this.initialise(parseTreeNode,options);
@@ -64,21 +63,27 @@ LinkWidget.prototype.renderLink = function(parent,nextSibling) {
 	var domNode = this.document.createElement(tag);
 	// Assign classes
 	var classes = [];
-	if(this.linkClasses) {
-		classes.push(this.linkClasses);
-	}
-	classes.push("tc-tiddlylink");
-	if(this.isShadow) {
-		classes.push("tc-tiddlylink-shadow");
-	}
-	if(this.isMissing && !this.isShadow) {
-		classes.push("tc-tiddlylink-missing");
-	} else {
-		if(!this.isMissing) {
-			classes.push("tc-tiddlylink-resolves");
+	if(this.overrideClasses === undefined) {
+		classes.push("tc-tiddlylink");
+		if(this.isShadow) {
+			classes.push("tc-tiddlylink-shadow");
 		}
+		if(this.isMissing && !this.isShadow) {
+			classes.push("tc-tiddlylink-missing");
+		} else {
+			if(!this.isMissing) {
+				classes.push("tc-tiddlylink-resolves");
+			}
+		}
+		if(this.linkClasses) {
+			classes.push(this.linkClasses);			
+		}
+	} else if(this.overrideClasses !== "") {
+		classes.push(this.overrideClasses)
 	}
-	domNode.setAttribute("class",classes.join(" "));
+	if(classes.length > 0) {
+		domNode.setAttribute("class",classes.join(" "));
+	}
 	// Set an href
 	var wikilinkTransformFilter = this.getVariable("tv-filter-export-link"),
 		wikiLinkText;
@@ -169,15 +174,23 @@ LinkWidget.prototype.execute = function() {
 	this.tooltip = this.getAttribute("tooltip");
 	this["aria-label"] = this.getAttribute("aria-label");
 	this.linkClasses = this.getAttribute("class");
+	this.overrideClasses = this.getAttribute("overrideClass");
 	this.tabIndex = this.getAttribute("tabindex");
 	this.draggable = this.getAttribute("draggable","yes");
 	this.linkTag = this.getAttribute("tag","a");
 	// Determine the link characteristics
 	this.isMissing = !this.wiki.tiddlerExists(this.to);
 	this.isShadow = this.wiki.isShadowTiddler(this.to);
-	this.hideMissingLinks = ($tw.wiki.getTiddlerText(MISSING_LINK_CONFIG_TITLE,"yes") === "no");
+	this.hideMissingLinks = (this.getVariable("tv-show-missing-links") || "yes") === "no";
 	// Make the child widgets
-	this.makeChildWidgets();
+	var templateTree;
+	if(this.parseTreeNode.children && this.parseTreeNode.children.length > 0) {
+		templateTree = this.parseTreeNode.children;
+	} else {
+		// Default template is a link to the title
+		templateTree = [{type: "text", text: this.to}];
+	}
+	this.makeChildWidgets(templateTree);
 };
 
 /*
@@ -185,7 +198,7 @@ Selectively refreshes the widget if needed. Returns true if the widget or any of
 */
 LinkWidget.prototype.refresh = function(changedTiddlers) {
 	var changedAttributes = this.computeAttributes();
-	if(changedAttributes.to || changedTiddlers[this.to] || changedAttributes["aria-label"] || changedAttributes.tooltip || changedTiddlers[MISSING_LINK_CONFIG_TITLE]) {
+	if(changedAttributes.to || changedTiddlers[this.to] || changedAttributes["aria-label"] || changedAttributes.tooltip) {
 		this.refreshSelf();
 		return true;
 	}

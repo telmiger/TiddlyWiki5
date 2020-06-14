@@ -1,6 +1,12 @@
+caption: Noteself
+color: #29B6F6
+community-author: Danielo Rodríguez
 created: 20141122093837330
-modified: 20170103222756776
-tags: Resources
+delivery: Web Service
+description: Free online service that you can also host yourself
+method: sync
+modified: 20200507203026367
+tags: Android Chrome Firefox [[Internet Explorer]] Linux Mac Opera PHP Resources Safari Saving Windows iOS Edge
 title: "Noteself" by Danielo Rodríguez
 type: text/vnd.tiddlywiki
 url: https://noteself.github.io/
@@ -9,7 +15,7 @@ url: https://noteself.github.io/
 You want cloud? Fine! You don't? Fine too! It's all yours, It's your decision!
 Why not be a bit selfish?
 
-{{!!url}}
+https://noteself.github.io/
 
 <<<
 ~NoteSelf is the perfect place to store your ideas, notes, thoughts, tips, tricks, recipes... 

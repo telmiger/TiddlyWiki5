@@ -35,15 +35,18 @@ DropZoneWidget.prototype.render = function(parent,nextSibling) {
 	this.execute();
 	// Create element
 	var domNode = this.document.createElement("div");
-	domNode.className = "tc-dropzone";
+	domNode.className = this.dropzoneClass || "tc-dropzone";
 	// Add event handlers
-	$tw.utils.addEventListeners(domNode,[
-		{name: "dragenter", handlerObject: this, handlerMethod: "handleDragEnterEvent"},
-		{name: "dragover", handlerObject: this, handlerMethod: "handleDragOverEvent"},
-		{name: "dragleave", handlerObject: this, handlerMethod: "handleDragLeaveEvent"},
-		{name: "drop", handlerObject: this, handlerMethod: "handleDropEvent"},
-		{name: "paste", handlerObject: this, handlerMethod: "handlePasteEvent"}
-	]);
+	if(this.dropzoneEnable) {
+		$tw.utils.addEventListeners(domNode,[
+			{name: "dragenter", handlerObject: this, handlerMethod: "handleDragEnterEvent"},
+			{name: "dragover", handlerObject: this, handlerMethod: "handleDragOverEvent"},
+			{name: "dragleave", handlerObject: this, handlerMethod: "handleDragLeaveEvent"},
+			{name: "drop", handlerObject: this, handlerMethod: "handleDropEvent"},
+			{name: "paste", handlerObject: this, handlerMethod: "handlePasteEvent"},
+			{name: "dragend", handlerObject: this, handlerMethod: "handleDragEndEvent"}
+		]);		
+	}
 	domNode.addEventListener("click",function (event) {
 	},false);
 	// Insert element
@@ -103,6 +106,10 @@ DropZoneWidget.prototype.handleDragLeaveEvent  = function(event) {
 	this.leaveDrag(event);
 };
 
+DropZoneWidget.prototype.handleDragEndEvent = function(event) {
+	$tw.utils.removeClass(this.domNodes[0],"tc-dragover");
+};
+
 DropZoneWidget.prototype.handleDropEvent  = function(event) {
 	var self = this,
 		readFileCallback = function(tiddlerFieldsArray) {
@@ -145,7 +152,7 @@ DropZoneWidget.prototype.handlePasteEvent  = function(event) {
 			self.dispatchEvent({type: "tm-import-tiddlers", param: JSON.stringify(tiddlerFieldsArray)});
 		};
 	// Let the browser handle it if we're in a textarea or input box
-	if(["TEXTAREA","INPUT"].indexOf(event.target.tagName) == -1) {
+	if(["TEXTAREA","INPUT"].indexOf(event.target.tagName) == -1 && !event.target.isContentEditable) {
 		var self = this,
 			items = event.clipboardData.items;
 		// Enumerate the clipboard items
@@ -183,7 +190,9 @@ DropZoneWidget.prototype.handlePasteEvent  = function(event) {
 Compute the internal state of the widget
 */
 DropZoneWidget.prototype.execute = function() {
+	this.dropzoneClass = this.getAttribute("class");
 	this.dropzoneDeserializer = this.getAttribute("deserializer");
+	this.dropzoneEnable = (this.getAttribute("enable") || "yes") === "yes";
 	// Make child widgets
 	this.makeChildWidgets();
 };
@@ -192,6 +201,11 @@ DropZoneWidget.prototype.execute = function() {
 Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
 */
 DropZoneWidget.prototype.refresh = function(changedTiddlers) {
+	var changedAttributes = this.computeAttributes();
+	if(changedAttributes.enable) {
+		this.refreshSelf();
+		return true;
+	}
 	return this.refreshChildren(changedTiddlers);
 };
 
