@@ -1,5 +1,5 @@
 created: 20200507002521489
-modified: 20200515012732244
+modified: 20200614182000000
 tags: 
 title: $:/_tw5.com-card-template
 type: text/vnd.tiddlywiki
@@ -7,10 +7,11 @@ type: text/vnd.tiddlywiki
 \define tw-card-template(bordercolor:"")
 <div class="tc-card" style="border-top: 5px solid $bordercolor$;">
 <$link>
-        <div class="tc-card-title"><$transclude field="caption"><$view field="title"/></$transclude></div>
-       <div class="tc-card-author"> <$list filter="[is[current]has[community-author]]">by {{!!community-author}}</$list></div>
-        <p><$view field="description"/></p>
+    <div class="tc-card-title"><$transclude field="caption"><$view field="title"/></$transclude></div>
+    <p><$view field="description"/></p>
  </$link>
+<div class="tc-card-author">
+    <$list filter="[is[current]has[community-author]]">by <$link to={{!!url}}>{{!!community-author}}</$link></$list></div>
 </div>
 \end
 
