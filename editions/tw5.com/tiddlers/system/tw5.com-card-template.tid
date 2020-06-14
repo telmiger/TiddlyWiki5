@@ -1,16 +1,18 @@
 created: 20200507002521489
-modified: 20200614182000000
+modified: 20200614220000000
 tags: 
 title: $:/_tw5.com-card-template
 type: text/vnd.tiddlywiki
 
 \define tw-card-template(bordercolor:"")
-<div class="tc-card" style="border-top: 5px solid $bordercolor$;">
-<$link>
-    <div class="tc-card-title"><$transclude field="caption"><$view field="title"/></$transclude></div>
-    <p><$view field="description"/></p>
- </$link>
-    <div class="tc-card-author">
+<div class="tc-solution-card">
+    <div class="tc-card" style="border-top: 5px solid $bordercolor$;">
+        <$link>
+            <div class="tc-card-title"><$transclude field="caption"><$view field="title"/></$transclude></div>
+            <p><$view field="description"/></p>
+        </$link>
+    </div>
+    <div class="tc-card-author" style="margin-top:-12px; text-align:center">
         <$list filter="[is[current]has[community-author]has[url]]">by <$link to={{!!url}}>{{!!community-author}}</$link></$list>
         <$list filter="[is[current]has[community-author]!has[url]]">by {{!!community-author}}</$list>
     </div>
